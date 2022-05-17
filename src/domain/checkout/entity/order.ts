@@ -1,5 +1,6 @@
 import OrderItem from "./order_item";
 export default class Order {
+
   private _id: string;
   private _customerId: string;
   private _items: OrderItem[];
@@ -44,6 +45,31 @@ export default class Order {
   }
 
   total(): number {
-    return this._items.reduce((acc, item) => acc + item.price, 0);
+    return this._items.reduce((acc, item) => acc + item.totalPrice(), 0);
+  }
+
+  private _findOrderItemById(id: string): OrderItem {
+    var orderItem = this._items.find((i) => i.id === id);
+    if (orderItem) {
+      return orderItem;
+    } else {
+      throw new Error("Order item not found.");
+    }
+  }
+
+  changeItemQuantity(orderItem: OrderItem, newQuantity: number) {
+    const orderItemFromThisOrder = this._findOrderItemById(orderItem.id);
+    if (newQuantity > 0) {
+      const orderWithNewQuantity = new OrderItem(
+        orderItem.id,
+        orderItem.name,
+        orderItem.price,
+        orderItem.productId,
+        newQuantity
+      );
+      const itemIndex = this._items.indexOf(orderItemFromThisOrder);
+      this._items[itemIndex] = orderWithNewQuantity;
+    }
+    this.validate();
   }
 }
